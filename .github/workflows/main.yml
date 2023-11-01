@@ -1,0 +1,29 @@
+name: Add TODO Issues to Project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add_todo_issue:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Add issue to project
+      run: |
+        # Използвайте GitHub API, за да добавите issue към проекта със статус 'TODO'
+        issue_number=$GITHUB_EVENT.issue.number
+        project_id=3 # Заменете с идентификатора на вашия проект
+        column_id=2    # Заменете с идентификатора на колоната 'TODO'
+        token=$GITHUB_TOKEN
+        response=$(curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: Bearer $token" \
+          -d "{\"content_id\": $issue_number, \"content_type\": \"Issue\"}" \
+          "https://api.github.com/projects/$project_id/columns/$column_id/cards")
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
